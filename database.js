@@ -1,94 +1,107 @@
-// Passo 1 - importar o motor do banco (sqite3) é o cerebro tradutor
+// Passo 1 - importar o motor do banco (sqlite3)
 
 const sqlite3 = require("sqlite3");
-
 const { open } = require("sqlite");
 
-// PAsso 2 Criar a função assincrona para gerenciar o banco
+// Passo 2 - Criar a função assíncrona para gerenciar o banco
 
 const criarBanco = async () => {
-  // Passo 3 Abrir ou criar o arquivo de banco de dados
+
+  // Passo 3 - Abrir ou criar o arquivo do banco
 
   const db = await open({
     filename: "./database.db",
-    // nome do arquivo que será criado
-
-    driver: sqlite3.Database, // o motor que vai realizar as operações
+    driver: sqlite3.Database
   });
 
-  // Passo 4: Criar a tabela de produtos
+  // Passo 4 - Criar tabela
 
   await db.exec(`
-    CREATE TABLE IF NOT EXISTS produto (
-     id INTERGIR PRIMARY KEY AUTOINCREMENT,          
-     nome TEXT,
-     categoria TEXT,
-     quantidade INTERGER,
-     preço REAL
+    CREATE TABLE IF NOT EXISTS produtos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT,
+      categoria TEXT,
+      quantidade INTEGER,
+      preco REAL
     )
-    `);
+  `);
 
-  console.log(`Tabela criada com sucesso`);
+  console.log("Tabela criada com sucesso!");
 
-  // passo 5: Inserir dados na nossa tabela (linhas) - C - Create - INSERT
+  // Passo 5 - Inserir dados
 
-  await db.exec(`INSERT INTO PRODUTOS (nome, categoria, quantidade, preço ) VALUES
-    
-    (Smarphone Samsung G24','Eletronicos', 50,2500),
-    ('Notebook Dell Inspiron','Informatica' ,15,4200,50),
-    ('Cadeira Gamer RGB', 'Moveis',10,1200,00)`);
+  await db.exec(`
+    INSERT INTO produtos (nome, categoria, quantidade, preco) VALUES
+    ('Smartphone Samsung G24','Eletronicos',50,2500),
+    ('Notebook Dell Inspiron','Informatica',15,4200.50),
+    ('Cadeira Gamer RGB','Moveis',10,1200.00)
+  `);
 
-  console.log(`Tabela criada e estoque abstecido`);
+  console.log("Tabela criada e estoque abastecido!");
 
-  // Passo 6 Buscar todos os produtos
+  // Passo 6 - Buscar todos os produtos
 
-  const inventario = await db.all(`Select``FROM produtos`);
+  const inventario = await db.all(`
+    SELECT * FROM produtos
+  `);
 
   console.table(inventario);
 
-  // passo7: buscando um produto especifico
-  const produtoEspecifico = await db.all(
-    `SELECT preco FROM produtos WHERE id = 2`,
-  );
+  // Passo 7 - Buscar produto específico
+
+  const produtoEspecifico = await db.all(`
+    SELECT preco FROM produtos WHERE id = 2
+  `);
+
   console.log(produtoEspecifico);
 
-  // atualizarinformações (U-Update)
+  // Passo 8 - Atualizar preço
 
   await db.run(`
-        UPDATE produtos        -- Atualize a tabela produtos
-        SET preco = 4500.00    -- Definindo que o notebook vai ser 4500.00
-        WHERE id = 2           -- Cuidado sem WHERE vai atuaizar todos os preços 
-        `);
-  console.log("Preço do notebook atuaizado com sucesso!");
+    UPDATE produtos
+    SET preco = 4500.00
+    WHERE id = 2
+  `);
 
-  //consultando novamente se a alteração realmente aconteceu
+  console.log("Preço do notebook atualizado com sucesso!");
 
-  const produtoAtualizado = await db.get(`
-            SELECT = FROM produtos`);
+  // Passo 9 - Consultar novamente
+
+  const produtoAtualizado = await db.all(`
+    SELECT * FROM produtos
+  `);
+
   console.table(produtoAtualizado);
 
-  //atualizando multiplos campos
+  // Passo 10 - Atualizar múltiplos campos
+
   await db.run(`
-        UPDATE produtos 
-        SET preco = 5100.23,
+    UPDATE produtos
+    SET preco = 5100.23,
         quantidade = 30
-        WHERE id = 2
-        
-        `);
+    WHERE id = 2
+  `);
 
-  //REMOVER UM PRODUTO (D - Deletar)
+  console.log("Produto atualizado!");
+
+  // Passo 11 - Deletar produto
+
   await db.run(`
-        DELETE FROM produtos
-        WHERE id = 3
-        
-        `);
+    DELETE FROM produtos
+    WHERE id = 3
+  `);
 
-   await db.exec(`
-    INSERT INTO produtos (nome , categoria, quantidade, preco) VALUES
-    ("mouse", "informatica", 10 , 40.00)
-    
-    
-    `);
+  console.log("Produto removido!");
+
+  // Passo 12 - Inserir novo produto
+
+  await db.exec(`
+    INSERT INTO produtos (nome, categoria, quantidade, preco)
+    VALUES ('Mouse','Informatica',10,40.00)
+  `);
+
+  console.log("Novo produto inserido!");
+
 };
 
 criarBanco();
